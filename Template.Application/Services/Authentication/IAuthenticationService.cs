@@ -1,8 +1,10 @@
-﻿namespace Template.Application.Services.Authentication
+﻿using Template.Infrastructure.Interfaces;
+
+namespace Template.Application.Services.Authentication
 
 {
     public interface IAuthenticationService
     {
-        AuthenticationResult Login(string secretId);
+        string Login(string secretId, string buyerCookie, string url);
     }
 }

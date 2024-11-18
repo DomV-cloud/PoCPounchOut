@@ -1,23 +1,38 @@
-﻿using System.Xml.Linq;
+﻿using System.Xml;
+using System.Xml.Linq;
 
 namespace Template.Application.Services.MappingService
 {
     public class CxmlMappingService : ICxmlMappingService
     {
-        public string Parse(string xml)
+        public string ParseBuyerCookie(string xml)
         {
             var doc = XDocument.Parse(xml);
 
-            // Access specific elements, e.g., "BuyerCookie" or "Identity" in "From"
             var buyerCookie = doc.Descendants("BuyerCookie").FirstOrDefault()?.Value;
 
-            // simple validation
-            if (buyerCookie is null)
-            {
-                return "";
-            }
+            return buyerCookie ?? "";
+        }
 
-            return buyerCookie;
+        public string ParseSecretId(string xml)
+        {
+            var doc = XDocument.Parse(xml);
+
+            // Najdi Extrinsic s name="SecretId"
+            var secretId = doc.Descendants("Extrinsic")
+                .FirstOrDefault(e => (string)e.Attribute("name") == "SecretId")
+                ?.Value;
+
+            return secretId ?? "";
+        }
+
+        public string ParseUrl(string xml)
+        {
+            var doc = XDocument.Parse(xml);
+
+            var url = doc.Descendants("BrowserFormPost").Elements("URL").FirstOrDefault()?.Value;
+
+            return url ?? "";
         }
     }
 }

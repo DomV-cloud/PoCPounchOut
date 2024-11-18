@@ -3,5 +3,5 @@ using Template.Domain.Entities;
 
 namespace Template.Application.Services.Authentication
 {
-    public record AuthenticationResult(User? User, PunchOutResponse? PunchOutResponse);
+    public record AuthenticationResult(User? User, SuccessPunchOutResponse? PunchOutResponse);
 }

@@ -2,6 +2,7 @@
 using Template.Api.Filters;
 using Template.Application.Services.Authentication;
 using Template.Application.Services.MappingService;
+using Template.Infrastructure.Interfaces;
 
 namespace Template.Api.Controllers
 {
@@ -13,9 +14,6 @@ namespace Template.Api.Controllers
         private readonly IAuthenticationService _authenticationService;
         private readonly ILogger<AuthenticationController> _logger;
         private readonly ICxmlMappingService _cxmlMappingService;
-
-        //TODO: Adding Logging message
-        // TODO: Controllers should not retrieve sensitive data like token or Id
 
         public AuthenticationController(
             IAuthenticationService authenticationService,
@@ -33,7 +31,7 @@ namespace Template.Api.Controllers
         /// <param name="reponse"></param>
         /// <returns></returns>
         [HttpPost("punchOut", Name = "punchOut")]
-        public async Task<string> LoginPunchOut()
+        public async Task<IActionResult> LoginPunchOut()
         {
             // getting raw Request content
             Request.EnableBuffering();
@@ -43,13 +41,17 @@ namespace Template.Api.Controllers
             var rawRequestBody = await new StreamReader(Request.Body).ReadToEndAsync();
 
             // map cXML values SID
-            var parsedSiD = _cxmlMappingService.Parse(rawRequestBody);
+            var parsedSiD = _cxmlMappingService.ParseSecretId(rawRequestBody);
+
+            var parsedCookie = _cxmlMappingService.ParseBuyerCookie(rawRequestBody);
+
+            var parsedUrl = _cxmlMappingService.ParseUrl(rawRequestBody);
 
             // send request to database and
             //check if user with this SID exists
-            var response = _authenticationService.Login(parsedSiD);
+            var response = _authenticationService.Login(parsedSiD, parsedCookie, parsedUrl);
 
-            return response.PunchOutResponse.ResponseMessage;
+            return Content(response, "application/xml");
         }
     }
 }

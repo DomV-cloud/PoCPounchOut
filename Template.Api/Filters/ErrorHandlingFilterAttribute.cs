@@ -10,14 +10,12 @@ namespace Template.Api.Filters
             var exception = context.Exception;
 
             context.Result = new ObjectResult(
-                new { error = "An error occured while processing your request" })
+                new { error = exception.Message })
             {
                 StatusCode = 500
             };
 
             context.ExceptionHandled = true;
-
-
         }
     }
 }

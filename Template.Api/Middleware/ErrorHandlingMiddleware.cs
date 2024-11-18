@@ -31,9 +31,9 @@ namespace Template.Api.Middleware
             var code = HttpStatusCode.InternalServerError;
 
             var result = JsonSerializer.Serialize(
-                new {error = "An error occured while processing your request" });
+                new {error = exception.Message });
 
-            context.Response.ContentType = "application/json";
+            context.Response.ContentType = "application/xml";
 
             context.Response.StatusCode = (int)code;
 

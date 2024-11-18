@@ -2,6 +2,10 @@
 {
     public interface ICxmlMappingService
     {
-        string Parse(string xml);
+        string ParseSecretId(string xml);
+
+        string ParseBuyerCookie(string xml);
+
+        string ParseUrl(string xml);
     }
 }

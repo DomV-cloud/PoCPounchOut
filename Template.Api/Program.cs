@@ -1,16 +1,24 @@
-using Template.Infrastructure.DependencyInjection;
-using Template.Application.DependencyInjection;
-using Template.Application.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
-using Template.Api.Middleware;
+using Microsoft.Extensions.Configuration;
 using Template.Api.Filters;
+using Template.Api.Middleware;
+using Template.Application.DatabaseContext;
+using Template.Application.DependencyInjection;
+using Template.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 {
-    builder.Logging.ClearProviders();
-    builder.Logging.AddConsole();
+    builder.Services.AddLogging(loggingBuilder =>
+    {
+        loggingBuilder.AddConsole()
+            .AddFilter(DbLoggerCategory.Database.Command.Name, LogLevel.Information);
+        loggingBuilder.AddDebug();
+    });
 
-    builder.Services.AddControllers(options => options.Filters.Add<ErrorHandlingFilterAttribute>());
+    builder.Services
+        .AddControllers(options => options.Filters.Add<ErrorHandlingFilterAttribute>())
+        .AddXmlSerializerFormatters();
+
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 
@@ -18,8 +26,10 @@ var builder = WebApplication.CreateBuilder(args);
         .AddApplication()
         .AddInfrastructure(builder.Configuration);
 
-    builder.Services.AddDbContext<TemplateContext>(options =>
-               options.UseSqlServer(builder.Configuration.GetConnectionString("sqlConnection")));
+    builder.Services.AddDbContext<TemplateContext>(options => {
+        options.UseSqlServer(builder.Configuration.GetConnectionString("sqlConnection"));
+        options.EnableSensitiveDataLogging(true);
+    });
 
     builder.Services.AddCors(options =>
     {
